@@ -27,7 +27,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -36,11 +35,24 @@ enum IntoColorError {
 // Note that the implementation for tuple and array will be checked at compile
 // time, but the slice implementation needs to check the slice length! Also note
 // that correct RGB color values must be integers in the 0..=255 range.
+// 您的任务是完成此实现，并返回内部类型颜色的Ok结果。
+// 您需要为三个整数元组、三个整数数组和整数切片创建一个实现。
+// 请注意，元组和数组的实现将在编译时检查，但切片实现需要检查切片长度！
+// 另请注意，正确的RGB颜色值必须是0..=255范围内的整数。
 
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        match tuple {
+            (red @ 0..=255, green @ 0..=255, blue @ 0..=255) => {
+                let red= red as u8;
+                let green= green as u8;
+                let blue= blue as u8;
+                Ok(Color { red, green, blue })
+            }
+            _=>Err(Self::Error::IntConversion)
+        }
     }
 }
 
@@ -48,6 +60,15 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        match arr {
+            [red @ 0..=255, green @ 0..=255, blue @ 0..=255] => {
+                let red= red as u8;
+                let green= green as u8;
+                let blue= blue as u8;
+                Ok(Color { red, green, blue })
+            }
+            _=>Err(Self::Error::IntConversion)
+        }
     }
 }
 
@@ -55,6 +76,15 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len()!=3 {
+            return Err(Self::Error::BadLen)
+        }
+        let r = *slice.get(0).unwrap_or(&0);
+        let g = *slice.get(1).unwrap_or(&0);
+        let b = *slice.get(2).unwrap_or(&0);
+        let tuple = (r,g,b);
+
+        Color::try_from(tuple)
     }
 }
 
